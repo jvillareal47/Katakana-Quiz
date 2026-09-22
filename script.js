@@ -33,221 +33,213 @@ let userAnswers = [];
 let quizStartTime = 0;
 let totalTimeSeconds = 0;
 let videoStream = null;
-
 let studentDetails = { name: "", section: "" };
 
-// DOM ELEMENTS
-const screenIntro = document.getElementById("screen-intro");
-const screenQuiz = document.getElementById("screen-quiz");
-const screenResult = document.getElementById("screen-result");
+// WAIT FOR DOM TO LOAD
+document.addEventListener("DOMContentLoaded", () => {
+    const screenIntro = document.getElementById("screen-intro");
+    const screenQuiz = document.getElementById("screen-quiz");
+    const screenResult = document.getElementById("screen-result");
 
-const hudProgress = document.getElementById("hud-progress");
-const katakanaTarget = document.getElementById("katakana-target");
+    const hudProgress = document.getElementById("hud-progress");
+    const katakanaTarget = document.getElementById("katakana-target");
 
-const task1Box = document.getElementById("task1-box");
-const task2Box = document.getElementById("task2-box");
-const inputRomaji = document.getElementById("input-romaji");
-const inputEnglish = document.getElementById("input-english");
+    const task1Box = document.getElementById("task1-box");
+    const task2Box = document.getElementById("task2-box");
+    const inputRomaji = document.getElementById("input-romaji");
+    const inputEnglish = document.getElementById("input-english");
 
-const btnStart = document.getElementById("btn-start");
-const btnSubmitTask1 = document.getElementById("btn-submit-task1");
-const btnSubmitTask2 = document.getElementById("btn-submit-task2");
+    const btnStart = document.getElementById("btn-start");
+    const btnSubmitTask1 = document.getElementById("btn-submit-task1");
+    const btnSubmitTask2 = document.getElementById("btn-submit-task2");
 
-const webcamElement = document.getElementById("webcam");
-const photoCanvas = document.getElementById("photo-canvas");
-const btnSnap = document.getElementById("btn-snap");
-const btnRetake = document.getElementById("btn-retake");
+    const webcamElement = document.getElementById("webcam");
+    const photoCanvas = document.getElementById("photo-canvas");
+    const btnSnap = document.getElementById("btn-snap");
+    const btnRetake = document.getElementById("btn-retake");
 
-// EVENT LISTENERS
-btnStart.addEventListener("click", startQuiz);
-btnSubmitTask1.addEventListener("click", handleTask1);
-btnSubmitTask2.addEventListener("click", handleTask2);
-btnSnap.addEventListener("click", capturePhoto);
-btnRetake.addEventListener("click", resetCamera);
-document.getElementById("btn-download").addEventListener("click", downloadCertificate);
-
-function startQuiz() {
-    const name = document.getElementById("student-name").value.trim();
-    const section = document.getElementById("student-section").value.trim();
-
-    if (!name || !section) {
-        alert("Please enter both your Name and Section before starting!");
-        return;
-    }
-
-    studentDetails.name = name;
-    studentDetails.section = section;
+    if (btnStart) btnStart.addEventListener("click", startQuiz);
+    if (btnSubmitTask1) btnSubmitTask1.addEventListener("click", handleTask1);
+    if (btnSubmitTask2) btnSubmitTask2.addEventListener("click", handleTask2);
+    if (btnSnap) btnSnap.addEventListener("click", capturePhoto);
+    if (btnRetake) btnRetake.addEventListener("click", resetCamera);
     
-    currentIndex = 0;
-    userAnswers = [];
-    quizStartTime = Date.now();
+    const btnDownload = document.getElementById("btn-download");
+    if (btnDownload) btnDownload.addEventListener("click", downloadCertificate);
 
-    screenIntro.classList.remove("active");
-    screenQuiz.classList.add("active");
+    function startQuiz() {
+        const name = document.getElementById("student-name").value.trim();
+        const section = document.getElementById("student-section").value.trim();
 
-    loadItem();
-}
+        if (!name || !section) {
+            alert("Please enter both your Name and Section before starting!");
+            return;
+        }
 
-function loadItem() {
-    hudProgress.innerText = `${currentIndex + 1} / 25`;
-    katakanaTarget.innerText = quizData[currentIndex].katakana;
+        studentDetails.name = name;
+        studentDetails.section = section;
+        
+        currentIndex = 0;
+        userAnswers = [];
+        quizStartTime = Date.now();
 
-    inputRomaji.value = "";
-    inputEnglish.value = "";
+        screenIntro.classList.remove("active");
+        screenQuiz.classList.add("active");
 
-    task1Box.classList.remove("hidden");
-    task2Box.classList.add("hidden");
-}
-
-function handleTask1() {
-    const romajiVal = inputRomaji.value.trim();
-    if (!romajiVal) {
-        alert("Please enter the Romaji reading first.");
-        return;
-    }
-
-    task1Box.classList.add("hidden");
-    task2Box.classList.remove("hidden");
-}
-
-function handleTask2() {
-    const englishVal = inputEnglish.value.trim();
-    if (!englishVal) {
-        alert("Please enter the English translation/label.");
-        return;
-    }
-
-    // Record response without revealing correct status
-    userAnswers.push({
-        romajiInput: inputRomaji.value.trim(),
-        englishInput: englishVal
-    });
-
-    currentIndex++;
-    if (currentIndex < quizData.length) {
         loadItem();
-    } else {
-        finishQuiz();
-    }
-}
-
-// EVALUATION LOGIC
-function evaluateAnswer(input, correctList) {
-    if (!input) return 0;
-    
-    const cleanInput = input.toLowerCase().replace(/[^a-z0-9]/g, '');
-    
-    // 2.0 Points: Exact match
-    for (let target of correctList) {
-        let cleanTarget = target.toLowerCase().replace(/[^a-z0-9]/g, '');
-        if (cleanInput === cleanTarget) return 2;
     }
 
-    // 1.0 Point: Close match
-    for (let target of correctList) {
-        let cleanTarget = target.toLowerCase().replace(/[^a-z0-9]/g, '');
-        if (cleanInput.includes(cleanTarget) || cleanTarget.includes(cleanInput)) return 1;
+    function loadItem() {
+        hudProgress.innerText = `${currentIndex + 1} / 25`;
+        katakanaTarget.innerText = quizData[currentIndex].katakana;
+
+        inputRomaji.value = "";
+        inputEnglish.value = "";
+
+        task1Box.classList.remove("hidden");
+        task2Box.classList.add("hidden");
     }
 
-    // 0.5 Points: Meaningful attempt
-    if (cleanInput.length >= 2) return 0.5;
+    function handleTask1() {
+        const romajiVal = inputRomaji.value.trim();
+        if (!romajiVal) {
+            alert("Please enter the Romaji reading first.");
+            return;
+        }
 
-    return 0;
-}
+        task1Box.classList.add("hidden");
+        task2Box.classList.remove("hidden");
+    }
 
-function finishQuiz() {
-    totalTimeSeconds = Math.floor((Date.now() - quizStartTime) / 1000);
+    function handleTask2() {
+        const englishVal = inputEnglish.value.trim();
+        if (!englishVal) {
+            alert("Please enter the English translation/label.");
+            return;
+        }
 
-    screenQuiz.classList.remove("active");
-    screenResult.classList.add("active");
+        userAnswers.push({
+            romajiInput: inputRomaji.value.trim(),
+            englishInput: englishVal
+        });
 
-    let totalPoints = 0;
-    const tableBody = document.getElementById("results-table-body");
-    tableBody.innerHTML = "";
+        currentIndex++;
+        if (currentIndex < quizData.length) {
+            loadItem();
+        } else {
+            finishQuiz();
+        }
+    }
 
-    quizData.forEach((item, index) => {
-        let userAns = userAnswers[index];
+    function evaluateAnswer(input, correctList) {
+        if (!input) return 0;
+        const cleanInput = input.toLowerCase().replace(/[^a-z0-9]/g, '');
         
-        let scoreRomaji = evaluateAnswer(userAns.romajiInput, item.romaji);
-        let scoreEnglish = evaluateAnswer(userAns.englishInput, item.english);
-        let itemScore = scoreRomaji + scoreEnglish; // Max 4 points per item
-        
-        totalPoints += itemScore;
-
-        let isRomajiCorrect = scoreRomaji >= 1;
-        let isEnglishCorrect = scoreEnglish >= 1;
-
-        let tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${index + 1}</td>
-            <td><strong>${item.katakana}</strong></td>
-            <td class="${isRomajiCorrect ? 'text-correct' : 'text-incorrect'}">${userAns.romajiInput}</td>
-            <td class="${isEnglishCorrect ? 'text-correct' : 'text-incorrect'}">${userAns.englishInput}</td>
-            <td class="text-corrected">${item.romaji[0]} / ${item.english[0]}</td>
-            <td><strong>${itemScore} / 4 pts</strong></td>
-        `;
-        tableBody.appendChild(tr);
-    });
-
-    // Score scaled out of 100
-    let finalPercentage = Math.round((totalPoints / (25 * 4)) * 100);
-
-    document.getElementById("cert-name").innerText = studentDetails.name;
-    document.getElementById("cert-section").innerText = `Section: ${studentDetails.section}`;
-    document.getElementById("cert-score").innerText = `${finalPercentage} / 100`;
-
-    const mins = Math.floor(totalTimeSeconds / 60).toString().padStart(2, '0');
-    const secs = (totalTimeSeconds % 60).toString().padStart(2, '0');
-    document.getElementById("cert-time").innerText = `${mins}:${secs}`;
-    document.getElementById("cert-date").innerText = new Date().toLocaleDateString();
-
-    initCamera();
-}
-
-function initCamera() {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-                videoStream = stream;
-                webcamElement.srcObject = stream;
-                webcamElement.style.display = "block";
-                photoCanvas.style.display = "none";
-                btnSnap.style.display = "inline-block";
-                btnRetake.style.display = "none";
-            })
-            .catch(err => {
-                console.warn("Camera access denied or unavailable:", err);
-            });
+        for (let target of correctList) {
+            let cleanTarget = target.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (cleanInput === cleanTarget) return 2;
+        }
+        for (let target of correctList) {
+            let cleanTarget = target.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (cleanInput.includes(cleanTarget) || cleanTarget.includes(cleanInput)) return 1;
+        }
+        if (cleanInput.length >= 2) return 0.5;
+        return 0;
     }
-}
 
-function capturePhoto() {
-    const context = photoCanvas.getContext('2d');
-    context.drawImage(webcamElement, 0, 0, 320, 240);
-    const photoDataUrl = photoCanvas.toDataURL('image/png');
+    function finishQuiz() {
+        totalTimeSeconds = Math.floor((Date.now() - quizStartTime) / 1000);
 
-    const certPhoto = document.getElementById("certificate-photo");
-    certPhoto.style.backgroundImage = `url('${photoDataUrl}')`;
+        screenQuiz.classList.remove("active");
+        screenResult.classList.add("active");
 
-    webcamElement.style.display = "none";
-    photoCanvas.style.display = "block";
-    btnSnap.style.display = "none";
-    btnRetake.style.display = "inline-block";
-}
+        let totalPoints = 0;
+        const tableBody = document.getElementById("results-table-body");
+        tableBody.innerHTML = "";
 
-function resetCamera() {
-    webcamElement.style.display = "block";
-    photoCanvas.style.display = "none";
-    btnSnap.style.display = "inline-block";
-    btnRetake.style.display = "none";
-}
+        quizData.forEach((item, index) => {
+            let userAns = userAnswers[index];
+            
+            let scoreRomaji = evaluateAnswer(userAns.romajiInput, item.romaji);
+            let scoreEnglish = evaluateAnswer(userAns.englishInput, item.english);
+            let itemScore = scoreRomaji + scoreEnglish;
+            
+            totalPoints += itemScore;
 
-function downloadCertificate() {
-    const certElement = document.getElementById("certificate-wrapper");
-    html2canvas(certElement, { scale: 2 }).then(canvas => {
-        const link = document.createElement("a");
-        link.download = `${studentDetails.name.replace(/\s+/g, '_')}_Katakana_Certificate.png`;
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-    });
-}
+            let isRomajiCorrect = scoreRomaji >= 1;
+            let isEnglishCorrect = scoreEnglish >= 1;
+
+            let tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td><strong>${item.katakana}</strong></td>
+                <td class="${isRomajiCorrect ? 'text-correct' : 'text-incorrect'}">${userAns.romajiInput}</td>
+                <td class="${isEnglishCorrect ? 'text-correct' : 'text-incorrect'}">${userAns.englishInput}</td>
+                <td class="text-corrected">${item.romaji[0]} / ${item.english[0]}</td>
+                <td><strong>${itemScore} / 4 pts</strong></td>
+            `;
+            tableBody.appendChild(tr);
+        });
+
+        let finalPercentage = Math.round((totalPoints / (25 * 4)) * 100);
+
+        document.getElementById("cert-name").innerText = studentDetails.name;
+        document.getElementById("cert-section").innerText = `Section: ${studentDetails.section}`;
+        document.getElementById("cert-score").innerText = `${finalPercentage} / 100`;
+
+        const mins = Math.floor(totalTimeSeconds / 60).toString().padStart(2, '0');
+        const secs = (totalTimeSeconds % 60).toString().padStart(2, '0');
+        document.getElementById("cert-time").innerText = `${mins}:${secs}`;
+        document.getElementById("cert-date").innerText = new Date().toLocaleDateString();
+
+        initCamera();
+    }
+
+    function initCamera() {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    videoStream = stream;
+                    webcamElement.srcObject = stream;
+                    webcamElement.style.display = "block";
+                    photoCanvas.style.display = "none";
+                    btnSnap.style.display = "inline-block";
+                    btnRetake.style.display = "none";
+                })
+                .catch(err => {
+                    console.warn("Camera access denied or unavailable:", err);
+                });
+        }
+    }
+
+    function capturePhoto() {
+        const context = photoCanvas.getContext('2d');
+        context.drawImage(webcamElement, 0, 0, 320, 240);
+        const photoDataUrl = photoCanvas.toDataURL('image/png');
+
+        const certPhoto = document.getElementById("certificate-photo");
+        certPhoto.style.backgroundImage = `url('${photoDataUrl}')`;
+
+        webcamElement.style.display = "none";
+        photoCanvas.style.display = "block";
+        btnSnap.style.display = "none";
+        btnRetake.style.display = "inline-block";
+    }
+
+    function resetCamera() {
+        webcamElement.style.display = "block";
+        photoCanvas.style.display = "none";
+        btnSnap.style.display = "inline-block";
+        btnRetake.style.display = "none";
+    }
+
+    function downloadCertificate() {
+        const certElement = document.getElementById("certificate-wrapper");
+        html2canvas(certElement, { scale: 2 }).then(canvas => {
+            const link = document.createElement("a");
+            link.download = `${studentDetails.name.replace(/\s+/g, '_')}_Katakana_Certificate.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        });
+    }
+});
