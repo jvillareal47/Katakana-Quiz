@@ -272,7 +272,7 @@ body {
     height: 100%;
     background-size: cover;
     background-position: center;
-    opacity: 0.55; /* Reduced opacity overlay so selfie is clearly visible */
+    opacity: 0.55;
     z-index: 1;
 }
 
@@ -280,7 +280,7 @@ body {
     position: relative;
     z-index: 2;
     text-align: center;
-    background: rgba(255, 255, 255, 0.45); /* Low transparency white overlay */
+    background: rgba(255, 255, 255, 0.45);
     padding: 25px;
     border-radius: 15px;
 }
@@ -307,7 +307,7 @@ body {
 }
 
 .cert-name {
-    font-size: 3.5rem; /* Large clear font */
+    font-size: 3.5rem;
     color: #000000;
     text-decoration: underline;
     margin: 5px 0;
@@ -343,7 +343,7 @@ body {
 }
 
 .stat-value {
-    font-size: 3.2rem; /* Large legible score and time */
+    font-size: 3.2rem;
     font-weight: 900;
     color: var(--dark-green);
 }
