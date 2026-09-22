@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katakana & Gairaigo Mastery Quiz</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        
+        <!-- INTRO SCREEN -->
+        <div id="screen-intro" class="screen active">
+            <h1 class="title">Katakana & Gairaigo Mastery Quiz</h1>
+            <p class="subtitle">Japanese Foreign Loanwords Assessment</p>
+            
+            <div class="card intro-card">
+                <h2>Welcome Students!</h2>
+                <p>Japanese uses <strong>Katakana</strong> to write <em>Gairaigo</em> (words borrowed from other languages, mainly English). Because foreign sounds must fit Japanese moraic structure, consonant clusters and standalone consonants receive trailing vowels (e.g., "Desk" becomes <em>Desuku</em> デスク).</p>
+                
+                <h3>Quiz Instructions</h3>
+                <ul>
+                    <li>There are <strong>25 items</strong> in total.</li>
+                    <li>Each item has <strong>2 sequential tasks</strong>:
+                        <ol>
+                            <li>Type the correct <strong>Romaji reading</strong>.</li>
+                            <li>Type the <strong>English translation, brand name, or label</strong>.</li>
+                        </ol>
+                    </li>
+                    <li>You must answer Task 1 to unlock Task 2, and complete both before moving to the next question.</li>
+                    <li>Answers will remain hidden until you complete all 25 items.</li>
+                </ul>
+
+                <h3>Scoring System</h3>
+                <ul>
+                    <li><strong style="color:var(--correct-green)">2.0 Points:</strong> Exact match.</li>
+                    <li><strong style="color:var(--dark-purple)">1.0 Point:</strong> Close / phonetic match.</li>
+                    <li><strong style="color:orange">0.5 Points:</strong> Valid attempt that makes sense.</li>
+                </ul>
+
+                <h3>Student Information</h3>
+                <div class="form-group">
+                    <label for="student-name">Full Name:</label>
+                    <input type="text" id="student-name" placeholder="e.g., Maria Santos" required>
+                </div>
+                <div class="form-group">
+                    <label for="student-section">Section / Class:</label>
+                    <input type="text" id="student-section" placeholder="e.g., BSIT 2-A" required>
+                </div>
+
+                <button class="btn btn-primary" id="btn-start">Begin Quiz</button>
+            </div>
+        </div>
+
+        <!-- QUIZ SCREEN -->
+        <div id="screen-quiz" class="screen">
+            <div class="quiz-header card">
+                <div class="hud-item">
+                    <span class="hud-label">Question Progress</span>
+                    <span class="hud-value" id="hud-progress">1 / 25</span>
+                </div>
+            </div>
+
+            <div class="card question-card">
+                <div class="prompt-box">
+                    <span class="prompt-label">Katakana Word:</span>
+                    <h2 id="katakana-target" class="katakana-target">マクドナルド</h2>
+                </div>
+
+                <!-- TASK 1: ROMAJI -->
+                <div id="task1-box" class="task-box">
+                    <label for="input-romaji">Task 1: Type the Romaji Reading</label>
+                    <input type="text" id="input-romaji" placeholder="e.g., Makudonarudo" autocomplete="off">
+                    <button class="btn btn-secondary" id="btn-submit-task1">Submit Reading</button>
+                </div>
+
+                <!-- TASK 2: ENGLISH (Initially Hidden) -->
+                <div id="task2-box" class="task-box hidden">
+                    <label for="input-english">Task 2: Type the English Translation / Brand / Label</label>
+                    <input type="text" id="input-english" placeholder="e.g., McDonald's" autocomplete="off">
+                    <button class="btn btn-primary" id="btn-submit-task2">Next Question</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS & SUMMARY TABLE SCREEN -->
+        <div id="screen-result" class="screen">
+            <h1 class="title">Quiz Completed!</h1>
+            <p class="subtitle">Review your answers below and take your completion selfie.</p>
+
+            <div class="card">
+                <h2>Detailed Results Table</h2>
+                <div class="table-responsive">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Katakana</th>
+                                <th>Your Romaji Reading</th>
+                                <th>Your English Answer</th>
+                                <th>Correct Reading / Label</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-table-body">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SELFIE & CERTIFICATE SECTION -->
+            <div class="card camera-card">
+                <h2>Take Your Completion Selfie</h2>
+                <p>Your selfie will be displayed as the background of your official completion certificate.</p>
+                <div class="camera-wrapper">
+                    <video id="webcam" autoplay playsinline width="320" height="240"></video>
+                    <canvas id="photo-canvas" width="320" height="240" style="display:none;"></canvas>
+                </div>
+                <div class="camera-actions">
+                    <button class="btn btn-primary" id="btn-snap">📷 Take Selfie</button>
+                    <button class="btn btn-secondary" id="btn-retake" style="display: none;">🔄 Retake Photo</button>
+                </div>
+            </div>
+
+            <div id="certificate-wrapper" class="certificate-container">
+                <div id="certificate-photo" class="cert-photo-bg"></div>
+                <div class="cert-overlay">
+                    <div class="cert-header">
+                        <h2>CERTIFICATE OF COMPLETION</h2>
+                        <p>Japanese Katakana & Gairaigo Assessment</p>
+                    </div>
+
+                    <div class="cert-body">
+                        <p class="cert-text">This is proudly presented to</p>
+                        <h1 class="cert-name" id="cert-name">Student Name</h1>
+                        <p class="cert-section" id="cert-section">Section: Class Name</p>
+
+                        <div class="cert-stats">
+                            <div class="stat-box">
+                                <span class="stat-label">FINAL SCORE</span>
+                                <span class="stat-value" id="cert-score">0 / 100</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">TOTAL TIME TAKEN</span>
+                                <span class="stat-value" id="cert-time">00:00</span>
+                            </div>
+                        </div>
+
+                        <div class="cert-details">
+                            <p><strong>Date Completed:</strong> <span id="cert-date">---</span></p>
+                        </div>
+
+                        <p class="cert-note">🎉 Successfully completed all 25 Katakana & Loanword Tasks!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="btn-download">Download Certificate (PNG)</button>
+                <button class="btn btn-secondary" onclick="location.reload()">Restart Quiz</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
