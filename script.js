@@ -15,7 +15,7 @@ const quizData = [
     { katakana: "カー", romaji: ["Kā", "Kaa", "Cā", "Caa"], english: ["Car"] },
     { katakana: "チョコチップクッキー", romaji: ["Choko Cippu Kukkī", "Choko Chippu Kukkii"], english: ["Chocolate Chip Cookie"  "Choco Chip Cookie"] },
     { katakana: "エアコン", romaji: ["Eakon"], english: ["Aircon", "Air Conditioner"] },
-    { katakana: "キッチンセット", romaji: ["Kitchin Setto", "Kicchin Setto], english: ["Kitchen Set"] },
+    { katakana: "キッチンセット", romaji: ["Kitchin Setto", "Kicchin Setto"], english: ["Kitchen Set"] },
     { katakana: "チーズリング", romaji: ["Chīzu Ringu", "Chiizu Ringu"], english: ["Cheese Ring"] },
     { katakana: "グレープグミキャンディ", romaji: ["Gurēpu Gamī Kyandī", "Gureepu Gumi Kyandii"], english: ["Grape Gummy Candy"] },
     { katakana: "コンピューター", romaji: ["Kompyūtā", "Kompyuutaa"], english: ["Computer"] },
